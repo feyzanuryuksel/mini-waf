@@ -1,110 +1,135 @@
-# 🛡️ Mini-WAF: Web Application Firewall & Security Dashboard
+# 🛡️ Mini-WAF: Web Application Firewall & Security Operations Dashboard
 
-![Sürüm](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Node.js](https://img.shields.io/badge/Node.js-Express-green.svg)
-![React](https://img.shields.io/badge/React-Dashboard-61dafb.svg)
-![Güvenlik](https://img.shields.io/badge/Security-OWASP_Top_10-red.svg)
+![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
+![Status](https://img.shields.io/badge/Status-Active-success.svg)
+![Node.js](https://img.shields.io/badge/Backend-Node.js_|_Express-339933.svg)
+![React](https://img.shields.io/badge/Frontend-React_|_Recharts-61DAFB.svg)
+![Security](https://img.shields.io/badge/Focus-Threat_Analysis_&_SOC-red.svg)
 
-**Mini-WAF**, modern web uygulamalarını siber saldırılara karşı korumak, HTTP trafiğini analiz etmek ve tehditleri gerçek zamanlı (real-time) izlemek amacıyla geliştirilmiş bir **Kavram Kanıtı (Proof of Concept - PoC)** projesidir. Sistem; zararlı trafikleri yakalayan bir Reverse Proxy (Ters Vekil) motoru, saldırıları görselleştiren bir React paneli ve test senaryoları için bilerek zafiyetli bırakılmış (Vulnerable) bir hedef uygulamadan oluşmaktadır.
+## 📌 Yönetici Özeti (Executive Summary)
 
----
+**Mini-WAF**, modern web uygulamalarını OWASP Top 10 zafiyetlerine karşı korumak amacıyla tasarlanmış, kural tabanlı (rule-based) bir **Web Application Firewall (WAF)** ve **Tehdit İstihbaratı (Threat Intelligence)** projesidir. 
 
-## 📸 Ekran Görüntüleri
+Sistem; ağ trafiğini "Ters Vekil" (Reverse Proxy) mimarisiyle üzerine alır, Zararlı Yükleri (Malicious Payloads) hedef sisteme ulaşmadan önce derinlemesine analiz eder (Deep Packet Inspection mantığıyla) ve engellenen olayları gerçek zamanlı olarak bir **Security Operations Center (SOC)** paneline aktarır.
 
-*Aşağıdaki alanlara projenin çalıştığı anlara ait ekran görüntülerini ekleyiniz. (Örn: Ekran görüntüsünü GitHub'a sürükleyip bırakarak linkini alabilirsiniz).*
-
-**1. Gerçek Zamanlı Tehdit İzleme Paneli (Dashboard)**
-> `![Dashboard Görünümü](BURAYA_FOTOGRAF_LINKINI_YAPISTIR)`
-*(Açıklama: React ile geliştirilen, MongoDB'den anlık veri çeken saldırı izleme ve analitik ekranı.)*
-
-**2. WAF Engelleme İşlemi (Terminal & Tarayıcı Logları)**
-> `![WAF Block Screen](BURAYA_FOTOGRAF_LINKINI_YAPISTIR)`
-*(Açıklama: Zararlı bir payload'un WAF tarafından HTTP 403 Forbidden ile engellendiği an.)*
-
-**3. VulnBank Test Ortamı (Hedef Uygulama)**
-> `![Kurban Uygulama](BURAYA_FOTOGRAF_LINKINI_YAPISTIR)`
-*(Açıklama: Zafiyet testleri (Penetration Testing) için hazırlanan senaryo tabanlı hedef uygulama.)*
+Bu proje, siber saldırıların nasıl çalıştığını (Offensive) ve bu saldırıların uygulama katmanında nasıl izole edilip engellendiğini (Defensive) uçtan uca göstermek için bir Kavram Kanıtı (PoC) olarak geliştirilmiştir.
 
 ---
 
-## 🏗️ Sistem Mimarisi
+## 🚀 Güvenlik Yetenekleri ve Özellikler (Core Capabilities)
 
-Sistem 3 ana katmandan (Tier) oluşmaktadır:
+* **Aktif Tehdit Engelleme (Active Threat Mitigation):**
+  * **SQL Injection (SQLi):** `UNION SELECT`, `OR 1=1`, `SLEEP()` gibi mantıksal ve zaman tabanlı veritabanı manipülasyonlarını bloklar.
+  * **Cross-Site Scripting (XSS):** Sadece `<script>` etiketlerini değil; zararlı event handler'ları (`onerror`, `onload`) ve DOM tabanlı manipülasyonları tespit eder.
+  * **Local File Inclusion / Path Traversal (LFI):** Dizin atlatma karakterlerini (`../`, `%2e%2e`) ve kritik OS dosyalarına (`/etc/passwd`, `C:\Windows`) erişim girişimlerini engeller.
 
-1. **Hedef Uygulama (Port 3001):** İçerisinde SQLi, XSS ve LFI zafiyetleri barındıran test laboratuvarı.
-2. **WAF Motoru (Port 3002):** Araya girerek (Man-in-the-Middle) trafiği dinleyen, zararlı payload'ları (Regex kuralları ile) tespit edip bloklayan ve IP/Coğrafi konum verilerini veritabanına işleyen Express.js proxy katmanı.
-3. **SOC Paneli (Port 3000):** WAF tarafından veritabanına kaydedilen tehditleri (Threat Intelligence) görselleştiren React.js arayüzü.
+* **Olay Müdahalesi ve Telemetri (Incident Response & Telemetry):**
+  * HTTP isteklerindeki (Header, URI, Body) URL-encoded verileri otomatik decode ederek gizlenmiş (obfuscated) payload'ları açığa çıkarır.
+  * POST isteklerindeki Body verisini Proxy aşamasında yeniden yapılandırarak (Body Fix) veri kayıplarını önler.
 
+* **Gelişmiş Görünürlük (SOC Visibility):**
+  * Engellenen her istek için kaynak IP adresi üzerinden **Geo-Location (Coğrafi Konum)** tespiti yapar.
+  * Saldırı vektörlerini, zaman damgalarını ve saldırı türlerini MongoDB üzerinde normalize ederek kalıcı loglar (Audit Trails) oluşturur.
+  * React tabanlı arayüz ile polling mekanizması kullanarak sayfayı yenilemeden canlı anomali takibi sağlar.
 
-graph TD
-    Client[👤 İstemci / Saldırgan] -->|HTTP Request| WAF{🛡️ WAF Proxy <br> Port 3002}
-    
-    WAF -->|✅ Temiz İstek| Target[🏦 Hedef Uygulama <br> Port 3001]
-    WAF -->|❌ Zararlı Payload| Block[⛔ HTTP 403 Blocked]
-    
-    WAF -.->|📝 Olay Kaydı & GeoIP| DB[(MongoDB Atlas)]
-    
-    Dashboard[💻 React SOC Paneli <br> Port 3000] -->|📡 Veri Çekme API| DB<img width="1897" height="1079" alt="Ekran görüntüsü 2026-06-11 213543" src="https://github.com/user-attachments/assets/60859b38-abee-4a73-8243-b8e297d8dfec" />
+---
 
+## 🏗️ Sistem Mimarisi (Architecture)
 
-✨ Temel Özellikler (Key Features)
-Gerçek Zamanlı Tehdit İzleme: React ve Axios ile belirli aralıklarla (polling) güncellenen dinamik veri akışı.
+Sistem, güvenlik prensipleri gereği (Separation of Concerns) üç izole katmandan oluşmaktadır:
 
-Kural Tabanlı Filtreleme (Rule-based WAF): OWASP standartlarına uygun Regex kuralları ile SQL Injection, Cross-Site Scripting (XSS) ve Path Traversal (LFI) koruması.
+1. **WAF Gateway (Port 3002):** İsteklerin karşılandığı, filtreleme kurallarının (Regex) işletildiği ve temiz trafiğin yönlendirildiği ana güvenlik duvarı.
+2. **Vulnerable Target / Kurban Uygulama (Port 3001):** WAF'ın koruma yeteneklerini test edebilmek için kasıtlı olarak SQLi, XSS ve LFI zafiyetleri barındıran simülasyon bankacılık portalı.
+3. **SOC Dashboard (Port 3000):** Güvenlik analistlerinin olayları (Incidents) izlediği veri görselleştirme arayüzü.
 
-GeoIP Analitiği: Saldırganın IP adresinden coğrafi konumunu (ülke) tespit etme.
+```text
+[Saldırgan/İstemci] 
+       │ (HTTP Request)
+       ▼
+[ WAF Proxy Motoru ] ──(Temiz İstek)──> [ Hedef Bankacılık Uygulaması ]
+       │ 
+       ├──(Zararlı İstek Yakalandı) ──> ⛔ HTTP 403 Forbidden
+       │
+       ▼ (IP, Ülke, Payload, Zaman Damgası)
+[ MongoDB Atlas Veritabanı ] 
+       │
+       ▼ (REST API Polling)
+[ SOC Tehdit İzleme Paneli (React) ]
+```
 
-Reverse Proxy: http-proxy-middleware kullanılarak güvenli veri aktarımı ve body-parsing düzeltmeleri (POST fix).
+💻 Teknoloji Yığını (Tech Stack)
+Backend (Güvenlik & Proxy Katmanı): Node.js, Express.js, http-proxy-middleware, geoip-lite
 
-🛠️ Kullanılan Teknolojiler
-Backend: Node.js, Express.js, http-proxy-middleware
+Frontend (İzleme Katmanı): React.js, Axios, Recharts (Veri Görselleştirme)
 
-Frontend: React.js, Recharts (Grafikler), Axios
+Veritabanı: MongoDB, Mongoose ORM
 
-Veritabanı & Güvenlik: MongoDB, Mongoose, GeoIP-lite, dotenv
+Güvenlik Standardı: OWASP Top 10 Mitigation Guidelines
 
-⚙️ Kurulum (Installation)
-Sistemi yerel ortamınızda (localhost) çalıştırmak için aşağıdaki adımları izleyin.
+📸 Sistem Görselleri (Screenshots)
+Not: Projeyi yerel ortamınızda çalıştırdığınızda aşağıdaki arayüzlerle karşılaşacaksınız.
+
+1. SOC Dashboard (Tehdit Paneli),2. VulnBank (Hedef Sistem),3. WAF Logları (Terminal)
+![Dashboard Resmi Ekle](Link_Buraya),![Banka Resmi Ekle](Link_Buraya),![Terminal Resmi Ekle](Link_Buraya)
+Anlık saldırı dağılımları ve detaylı olay logları (Incident Logs).,Zafiyet testleri için özel hazırlanmış finansal arayüz.,WAF motorunun payload tespit anı ve veritabanı kayıt işlemi.
+
+⚙️ Kurulum ve Yapılandırma (Installation)
+Sistemi lokal ortamınızda ayağa kaldırmak için Node.js'in yüklü olması gerekmektedir.
 
 1. Depoyu Klonlayın
-Bash
+```text
 git clone [https://github.com/KULLANICI_ADIN/mini-waf-projesi.git](https://github.com/KULLANICI_ADIN/mini-waf-projesi.git)
 cd mini-waf-projesi
-2. Çevre Değişkenlerini Ayarlayın (Environment Variables)
-Güvenlik standartları gereği MongoDB bağlantı dizesi GitHub üzerinde paylaşılmamıştır. waf-backend dizini altında .env adında bir dosya oluşturun ve .env.example dosyasındaki şablonu kullanarak kendi veritabanı bilgilerinizi girin.
-
-Plaintext
+```
+2. Çevre Değişkenlerini (Environment Variables) Tanımlayın
+Hardcoded şifreleme mantığından kaçınmak için MongoDB veritabanı bağlantısı .env dosyası üzerinden sağlanmaktadır. waf-backend dizini içinde .env adında bir dosya oluşturun ve .env.example dosyasını referans alarak kendi bilgilerinizi girin:
+```text
 # waf-backend/.env
-DB_URI=mongodb+srv://<kullanici_adi>:<sifre>@cluster.mongodb.net/mini-waf-db
-3. Bağımlılıkları Yükleyin ve Başlatın
-Sistem 3 farklı terminal penceresi gerektirir.
+DB_URI=mongodb+srv://<kullanici>:<sifre>@cluster.mongodb.net/mini-waf-db
+PORT=3002
+```
+3. Servisleri Başlatın
+Mikroservis benzeri bu yapıyı çalıştırmak için 3 ayrı terminal sekmesi kullanın:
 
-Terminal 1: Hedef Uygulamayı (Victim) Başlatın
-
-Bash
+Terminal 1 (Hedef Uygulama):
+```text
 cd waf-backend
 npm install
 node victim.js
-Terminal 2: WAF Motorunu Başlatın
-
-Bash
+# Port 3001'de çalışır
+```
+Terminal 2 (WAF Motoru):
+```text
 cd waf-backend
+npm install dotenv # (Eğer yüklü değilse)
 node server.js
-Terminal 3: React İzleme Panelini Başlatın
-
-Bash
+# Port 3002'de çalışır
+```
+Terminal 3 (SOC Paneli):
+```text
 cd waf-dashboard
 npm install
 npm start
-🧪 Kullanım ve Test Senaryoları
-Sistem ayağa kalktıktan sonra WAF sunucusu üzerinden (Port 3002) test işlemleri yapabilirsiniz:
+# Port 3000'de çalışır
+```
+🧪 Sızma Testi (Penetration Testing) Senaryoları
+Sistem ayağa kalktıktan sonra, WAF'ın koruma kalkanını test etmek için WAF Gateway (http://localhost:3002) üzerinden aşağıdaki payload'ları deneyebilirsiniz.
 
-SQL Injection Testi: http://localhost:3002/login-page adresine gidin. Kullanıcı adı olarak ' OR 1=1 -- payload'unu deneyin.
+Tüm bu denemelerin hedef sisteme ulaşamadan HTTP 403 hatasıyla düşürüldüğünü ve React Dashboard üzerinde loglandığını gözlemleyebilirsiniz.
 
-XSS Testi: http://localhost:3002/transactions adresine gidin. Arama kısmına <script>alert(1)</script> yazın.
+Senaryo 1: Authentication Bypass (SQL Injection)
+Hedef URL: http://localhost:3002/login-page
 
-LFI Testi: URL üzerinden http://localhost:3002/file?name=../../victim.js dizin atlama saldırısı deneyin.
+Test Payload: Formdaki kullanıcı adı alanına ' OR 1=1 -- yazarak şifresiz giriş yapmayı deneyin. WAF anında veritabanı manipülasyonunu tespit edecektir.
 
-Tüm bu denemeler WAF tarafından engellenecek (403 Error) ve React Dashboard üzerinde kırmızı loglar halinde raporlanacaktır.
+Senaryo 2: Reflected XSS
+Hedef URL: http://localhost:3002/transactions
 
-⚠️ Bilgi: Bu proje yalnızca akademik/eğitim amaçlı ve siber güvenlik konseptlerini anlamak için geliştirilmiştir. Yetkisiz sistemler üzerinde kullanılamaz.
+Test Payload: Arama çubuğuna <script>alert(document.cookie)</script> girin. WAF, istemci tarafı (client-side) kod çalıştırma girişimini bloklayacaktır.
+
+Senaryo 3: Local File Inclusion (LFI)
+Hedef URL: http://localhost:3002/documents
+
+Test Payload: URL sonuna manuel olarak müdahale edip http://localhost:3002/file?name=../../../../../etc/passwd parametresini gönderin. Dizin atlatma (Path Traversal) denemesi başarısız olacaktır.
+
+Önemli: Bu sistem; siber güvenlik analizleri, savunma mekanizmaları geliştirme ve akademik amaçlar doğrultusunda hazırlanmıştır. Yalnızca yetkiniz dahilindeki sistemlerde test ediniz.

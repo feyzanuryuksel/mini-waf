@@ -1,0 +1,158 @@
+:root {
+  --qradar-bg: #161616;
+  --qradar-card: #262626;
+  --qradar-border: #393939;
+  --ibm-blue: #0f62fe;
+  --text-main: #f4f4f4;
+  --text-secondary: #c6c6c6;
+}
+
+body {
+  margin: 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+  background-color: var(--qradar-bg);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+.App {
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* TOP NAV */
+.top-nav {
+  height: 60px;
+  background-color: #161616;
+  border-bottom: 2px solid var(--ibm-blue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.nav-brand {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.console-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.nav-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* DASHBOARD GRID */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background-color: var(--qradar-border);
+  border-bottom: 1px solid var(--qradar-border);
+}
+
+.grid-item {
+  background-color: var(--qradar-card);
+  padding: 25px;
+}
+
+.widget-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  border-left: 3px solid var(--ibm-blue);
+  padding-left: 10px;
+}
+
+/* HEALTH METRICS */
+.health-metrics .metric {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.alert-box {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #393939;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  color: #c6c6c6;
+}
+
+.alert-tag {
+  color: var(--ibm-blue);
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* TABLE STYLES */
+.log-activity-panel {
+  padding: 30px;
+}
+
+.table-wrapper {
+  border: 1px solid var(--qradar-border);
+  background: var(--qradar-card);
+}
+
+.qradar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.qradar-table th {
+  background-color: #393939;
+  padding: 12px;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.qradar-table td {
+  padding: 12px;
+  border-bottom: 1px solid #333;
+}
+
+.qradar-table tr:hover {
+  background-color: #333;
+}
+
+.severity-bar {
+  width: 4px;
+  height: 18px;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.ip-text { color: #78a9ff; font-family: monospace; }
+.payload-text {
+  font-family: monospace;
+  color: #8d8d8d;
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Grafik Etiketleri (Numbers) için Stil */
+.recharts-pie-label-text {
+  fill: #f4f4f4 !important;
+  font-size: 12px;
+  font-weight: bold;
+}
